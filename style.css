@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+}
+
+#header1 {
+  background-color: black;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  padding-left: 4%;
+}
+
+label {
+  font-size: 17.5px;
+}
+
+input, textarea {
+  font-size: 15px;
+  font-family: Roboto, sans-serif;
+}
+
+#headerText {
+  margin: 0;
+  color: rgb(255, 215, 0);
+  margin-bottom: 5px;
+}
+
+#blueText {
+  color: rgb(0, 87, 183);
+}
+
+#newBtn {
+  border: none;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 6px;
+  padding-right: 6px;
+  background-color: darkslategray;
+  color: white;
+}
+
+#divider {
+  border-left: 2px solid #c9c9c9;
+  height: 350px;
+}
+
+.floatClass {
+  float: left;
+  margin-top: 2%;
+  margin-left: 4%;
+}
+
+.notes {
+  border: 2px solid lightgray;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-bottom: 2%;
+  border-radius: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+#disclaimer {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 5px;
+  right: 50px;
+  color: lightgray;
+}
+#disclaimer-link, #disclaimer-link:visited {
+  color: lightgray;
+}
+#haventFilledOutDiv {
+  color: red;
+  margin: bottom;
+}
+.export-button, .delete-button {
+  margin-bottom: 8px;
+  margin-right: 3px;
+}
+button {
+  border-color: transparent;
+  border-radius: 5px;
+  background-color: darkslategray;
+  color: white;
+  font-family: Roboto, sans-serif;
+  transition: background-color 250ms linear;
+}
+button:hover {
+  background-color: #000061;
+}
+
+#darkModeSwitch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 5%;
+}

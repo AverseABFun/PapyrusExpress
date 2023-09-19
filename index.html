@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>PapyrusExpress</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+  </head>
+  <body>
+    <header id="header1">
+      <h1 id="headerText"><span id="blueText">Papyrus</span>Express</h1>
+      <img id="darkModeSwitch" src="5041877.png" onclick="darkModeSwitch();">
+      <button onclick="document.getElementById('deleteAllQuestionDiv').classList.remove('hidden')">Delete all</button>
+      <button onclick="importNote();">Import note</button>
+      <button onclick="exportNotes();">Export all notes</button>
+    </header>
+    <input id="fileImport" type="file" style="position: fixed; top: -100%" accept=".note,.notes">
+    <div id="deleteQuestionDiv" class="hidden" class="confirmation">
+      <p class="deleteprompt">Delete the note?<br></p>
+      <button id="delete-yes">Yes</button><button id="delete-no">No</button>
+    </div>
+    <div id="deleteAllQuestionDiv" class="hidden" class="confimation">
+      <p class="deleteprompt">Delete all of your notes?<br></p>
+      <button id="deleteAll-yes" onclick="window.localStorage.removeItem('papyrus-notes'); window.localStorage.removeItem('papyrus-notes-num'); window.location.reload();document.getElementById('deleteAllQuestionDiv').classList.add('hidden')">Yes</button><button id="deleteAll-no" onclick="document.getElementById('deleteAllQuestionDiv').classList.add('hidden')">No</button>
+    </div>
+    <div id="valuesDiv" class="floatClass">
+      <div id="haventFilledOutDiv" class="hidden">
+        You haven't filled out everything! If you don't want a value somewhere, type "N/A".
+      </div>
+      <div id="sourceTypeDiv">
+        <div id="radioBtnDiv">
+          <label for="primaryInp">Primary</label>
+          <input id="primaryInp" name="inpType" type="radio">
+          <label for="secondaryInp">Secondary</label>
+          <input id="secondaryInp" name="inpType" type="radio"><br><br>
+        </div>
+      </div>
+      <label for="noteHeadingText">Heading</label><br>
+      <input id="noteHeadingText" name="noteHeadingText" type="text"><br><br>
+      <label for="noteBodyText">Body</label><br>
+      <textarea id="noteBodyText" name="noteBodyText" placeholder="Drag the resizer in the corner."></textarea><br><br>
+      <label for="sourceText">Source (website, book, etc.)</label><br>
+      <input id="sourceText" name="sourceText" type="text"><br><br>
+      <button id="newBtn" onclick="newNote();">[+] New Note</button>
+    </div>
+    <div id="divider" class="floatClass"></div>
+    <div id="noteCtnDiv" class="floatClass">
+    </div>
+    <span id="disclaimer">Papyrus is not responsible for lost notes. <a id="disclaimer-link" href="/disclaimer">Learn more</a> | © Cosmic Technologies</span>
+    <script src="script.js"></script>
+  </body>
+</html>

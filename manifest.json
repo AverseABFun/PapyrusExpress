@@ -1,0 +1,31 @@
+{
+  "short_name": "Papyrus",
+  "name": "PapyrusExpress",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/192image.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000",
+  "shortcuts": [
+    {
+      "name": "PapyrusExpress",
+      "short_name": "Papyrus",
+      "description": "Make a new note/view your notes",
+      "url": "/?source=pwa",
+      "icons": [{ "src": "/192image.png", "sizes": "192x192" }]
+    }
+  ]
+}
