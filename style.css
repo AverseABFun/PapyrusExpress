@@ -58,6 +58,7 @@ input, textarea {
   padding-left: 15px;
   margin-bottom: 2%;
   border-radius: 10px;
+  background-color: ;
 }
 
 .hidden {
@@ -78,7 +79,7 @@ input, textarea {
   color: red;
   margin: bottom;
 }
-.export-button, .delete-button {
+.export-button, .delete-button, .edit-button {
   margin-bottom: 8px;
   margin-right: 3px;
 }

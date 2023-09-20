@@ -1,10 +1,5 @@
-/* implement validation, error msg*/ /* Done */
-/* implement storage, export */ /* Done */
-/* implement deletion of notes */ /* Done */
 /* make notes look better */
-/* add note number */ /* Done */
-/* grid view instead? */
-/* dark mode!!! */ /* Done(kinda) */
+/* = */ /* grid view instead? */
 /* folders */
 /* editing notes */ /* In progress */
 /* make not filled out thing fade out after a bit */
@@ -58,12 +53,21 @@ function newNote() {
   };
   exportButton.innerHTML = "Export";
   note.appendChild(exportButton);
+  var editButton = document.createElement("button");
+  editButton.classList.add("edit-button");
+  editButton.onclick = editThing(note.id);
+  editButton.innerHTML = "Edit";
+  note.appendChild(editButton);
   var deleteButton = document.createElement("button");
   deleteButton.classList.add("delete-button");
   deleteButton.onclick = deleteQuestion(note.id);
   deleteButton.innerHTML = "Delete";
   note.appendChild(deleteButton);
   document.getElementById("noteCtnDiv").appendChild(note);
+  var uuidThing = document.createElement("span");
+  uuidThing.style.display = "none";
+  uuidThing.class = "uuid";
+  uuidThing.innerHTML = crypto.randomUUID();
   var prevData = "[]";
   if (window.localStorage.getItem("papyrus-notes")) {
     prevData = window.localStorage.getItem("papyrus-notes");
@@ -73,7 +77,8 @@ function newNote() {
     heading: document.getElementById("noteHeadingText").value,
     body: document.getElementById("noteBodyText").value,
     type: document.getElementById("primaryInp").checked ? "Primary Source" : "Secondary Source",
-    source: document.getElementById("sourceText").value
+    source: document.getElementById("sourceText").value,
+    uuid: document.querySelector(`#${note.id}>.uuid`).innerHTML
   };
   prevData.push(newData)
   var data = JSON.stringify(prevData);
@@ -111,7 +116,8 @@ function deleteQuestion(id) {
         heading: document.querySelector(`#${note.id}>.heading`).innerText,
         body: document.querySelector(`#${note.id}>.body`).innerText,
         type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-        source: document.querySelector(`#${note.id}>.source`).innerText
+        source: document.querySelector(`#${note.id}>.source`).innerText,
+        uuid: crypto.randomUUID()
       };
       notess.push(notee);
     }
@@ -127,13 +133,29 @@ function deleteQuestion(id) {
 }
 
 function editThing(id) {
-  //This doesnt work
-  throw Error("Not implemented: editThing");
+  var jsonThing = null;
+  var jsonIndex = 0;
+  for (var i in JSON.parse(window.localStorage.getItem("papyrus-notes"))) {
+    var item = JSON.parse(window.localStorage.getItem("papyrus-notes"))[i];
+    if (document.querySelector(`#${id}>.uuid`)==item.uuid) {
+      jsonThing = item;
+      jsonIndex = i;
+      break;
+    }
+  }
+  function callback(mutationRecords) {
+    console.log(mutationRecords);
+    for (var i in mutationRecords) {
+      var item = mutationRecords[i];
+      item.target.innerText
+    }
+  }
   return function() {
+  const config = { attributes: false, childList: true, subtree: true };
   document.getElementById(id).contentEditable = true;
   var observer = new MutationObserver(callback);
   observer.observe(document.getElementById(id), config);
-
+  
   }
 }
 
@@ -155,7 +177,8 @@ function exportNote(id) {
     heading: document.querySelector(`#${id}>.heading`).innerText,
     body: document.querySelector(`#${id}>.body`).innerText,
     type: document.querySelector(`#${id}>.sourceType`).innerText,
-    source: document.querySelector(`#${id}>.source`).innerText
+    source: document.querySelector(`#${id}>.source`).innerText,
+    //uuid: document.querySelector(`#${id}>.uuid`).innerText
   };
   note = btoa(JSON.stringify(note));
   var downloadElement = document.createElement("a");
@@ -179,7 +202,8 @@ function exportNotes() {
       heading: document.querySelector(`#${note.id}>.heading`).innerText,
       body: document.querySelector(`#${note.id}>.body`).innerText,
       type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-      source: document.querySelector(`#${note.id}>.source`).innerText
+      source: document.querySelector(`#${note.id}>.source`).innerText,
+      uuid: document.querySelector(`#${note.id}>.uuid`).innerText
     };
     notess.push(notee);
   }
@@ -235,11 +259,21 @@ function importNote() {
             };
             exportButton.innerHTML = "Export";
             note.appendChild(exportButton);
+            var editButton = document.createElement("button");
+            editButton.classList.add("edit-button");
+            editButton.onclick = editThing(`note${currentNotes}`);
+            editButton.innerHTML = "Edit";
+            note.appendChild(editButton);
             var deleteButton = document.createElement("button");
             deleteButton.classList.add("delete-button");
             deleteButton.onclick = deleteQuestion(`note${currentNotes}`);
             deleteButton.innerHTML = "Delete";
             note.appendChild(deleteButton);
+            var uuidThing = document.createElement("span");
+            uuidThing.style.display = "none";
+            uuidThing.class = "uuid";
+            uuidThing.innerHTML = iitem.uuid;
+            note.appendChild(uuidThing);
             document.getElementById("noteCtnDiv").appendChild(note);
             var prevData = "[]";
             if (window.localStorage.getItem("papyrus-notes")) {
@@ -290,11 +324,21 @@ function importNote() {
     };
     exportButton.innerHTML = "Export";
     note.appendChild(exportButton);
+    var editButton = document.createElement("button");
+    editButton.classList.add("edit-button");
+    editButton.onclick = editThing(`note${num}`);
+    editButton.innerHTML = "Edit";
+    note.appendChild(editButton);
     var deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.onclick = deleteQuestion(`note${num}`);
     deleteButton.innerHTML = "Delete";
     note.appendChild(deleteButton);
+    var uuidThing = document.createElement("span");
+    uuidThing.style.display = "none";
+    uuidThing.class = "uuid";
+    uuidThing.innerHTML = iitem.uuid;
+    note.appendChild(uuidThing);
     document.getElementById("noteCtnDiv").appendChild(note);
     var prevData = "[]";
     if (window.localStorage.getItem("papyrus-notes")) {
@@ -357,11 +401,21 @@ if (window.localStorage.getItem("papyrus-notes")) {
     };
     exportButton.innerHTML = "Export";
     note.appendChild(exportButton);
+    var editButton = document.createElement("button");
+    editButton.classList.add("edit-button");
+    editButton.onclick = editThing(`note${num}`);
+    editButton.innerHTML = "Edit";
+    note.appendChild(editButton);
     var deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.onclick = deleteQuestion(`note${num}`);
     deleteButton.innerHTML = "Delete";
     note.appendChild(deleteButton);
+    /*var uuidThing = document.createElement("span");
+    uuidThing.style.display = "none";
+    uuidThing.class = "uuid";
+    uuidThing.innerHTML = iitem.uuid;
+    note.appendChild(uuidThing);*/
     document.getElementById("noteCtnDiv").appendChild(note);
     tempNum++;
     })(item);
