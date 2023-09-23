@@ -101,3 +101,10 @@ button:hover {
   right: 10px;
   height: 5%;
 }
+#disclaimer-body {
+  background-color: black;
+  color: white;
+}
+#disclaimer-text {
+  margin: 5%;
+}
