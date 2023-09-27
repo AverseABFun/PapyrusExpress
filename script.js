@@ -1,19 +1,33 @@
 /* make notes look better */
+/* CLEAN UP CODE */
 /* = */ /* grid view instead? */
 /* folders */
-/* editing notes */ /* In progress */
-/* make not filled out thing fade out after a bit */
+/* editing notes */ /* Done, but the code is a horrible mess */
 /* Make things look nicer: 
 * yes/no prompt
 * middle bar thingy dynamic?
 * header scrolls w/ screen
 * confirmations (delete note/all)
+* code
 */
+
+// Copyright Cosmic Technologies 2023
+ 
 var currentNotes = window.localStorage.getItem("papyrus-notes-num") || 0;
 
 function newNote() {
   if (!document.getElementById("noteHeadingText").value || (!document.getElementById("primaryInp").checked && !document.getElementById("secondaryInp").checked) || !document.getElementById("noteBodyText").value || !document.getElementById("sourceText").value) {
-    document.getElementById("haventFilledOutDiv").classList.remove("hidden");
+    document.getElementById("haventFilledOutDiv").style.display = "block";
+    document.getElementById("haventFilledOutDiv").style.opacity = 1;
+    setTimeout(function(){
+      var interval = setInterval(function(){
+        document.getElementById("haventFilledOutDiv").style.opacity -= 0.05;
+        if (document.getElementById("haventFilledOutDiv").style.opacity<=0) {
+          clearInterval(interval);
+          document.getElementById("haventFilledOutDiv").style.display = "none";
+        }
+      },200)
+    },7000) //seven seconds;
     return;
   }
   document.getElementById("haventFilledOutDiv").classList.add("hidden");
@@ -51,23 +65,24 @@ function newNote() {
   exportButton.onclick = ()=>{
     exportNote(note.id);
   };
-  exportButton.innerHTML = "Export";
+  exportButton.innerText = "Export";
   note.appendChild(exportButton);
+  var uuidThing = document.createElement("span");
+  uuidThing.style.display = "none";
+  uuidThing.class = "uuid";
+  uuidThing.innerText = crypto.randomUUID();
+  note.appendChild(uuidThing);
   var editButton = document.createElement("button");
   editButton.classList.add("edit-button");
-  editButton.onclick = editThing(note.id);
-  editButton.innerHTML = "Edit";
+  editButton.innerText = "Edit";
   note.appendChild(editButton);
   var deleteButton = document.createElement("button");
   deleteButton.classList.add("delete-button");
   deleteButton.onclick = deleteQuestion(note.id);
-  deleteButton.innerHTML = "Delete";
+  deleteButton.innerText = "Delete";
   note.appendChild(deleteButton);
   document.getElementById("noteCtnDiv").appendChild(note);
-  var uuidThing = document.createElement("span");
-  uuidThing.style.display = "none";
-  uuidThing.class = "uuid";
-  uuidThing.innerHTML = crypto.randomUUID();
+  editButton.onclick = editThing(note.id);
   var prevData = "[]";
   if (window.localStorage.getItem("papyrus-notes")) {
     prevData = window.localStorage.getItem("papyrus-notes");
@@ -78,7 +93,7 @@ function newNote() {
     body: document.getElementById("noteBodyText").value,
     type: document.getElementById("primaryInp").checked ? "Primary Source" : "Secondary Source",
     source: document.getElementById("sourceText").value,
-    uuid: document.querySelector(`#${note.id}>.uuid`).innerHTML
+    uuid: uuidThing.innerText
   };
   prevData.push(newData)
   var data = JSON.stringify(prevData);
@@ -117,7 +132,7 @@ function deleteQuestion(id) {
         body: document.querySelector(`#${note.id}>.body`).innerText,
         type: document.querySelector(`#${note.id}>.sourceType`).innerText,
         source: document.querySelector(`#${note.id}>.source`).innerText,
-        uuid: crypto.randomUUID()
+        uuid: document.querySelector(`#${note.id}>.uuid`).innerText
       };
       notess.push(notee);
     }
@@ -135,27 +150,55 @@ function deleteQuestion(id) {
 function editThing(id) {
   var jsonThing = null;
   var jsonIndex = 0;
-  for (var i in JSON.parse(window.localStorage.getItem("papyrus-notes"))) {
-    var item = JSON.parse(window.localStorage.getItem("papyrus-notes"))[i];
-    if (document.querySelector(`#${id}>.uuid`)==item.uuid) {
+  var allData = JSON.parse(window.localStorage.getItem("papyrus-notes"));
+  for (var i in allData) {
+    var item = allData[i];
+    console.log(item)
+    if (document.querySelector(`#${id}>.uuid`).innerText==item.uuid) {
       jsonThing = item;
       jsonIndex = i;
       break;
     }
   }
-  function callback(mutationRecords) {
-    console.log(mutationRecords);
-    for (var i in mutationRecords) {
-      var item = mutationRecords[i];
-      item.target.innerText
+  var firstEdit = true;
+  function wrapper(type) {
+  return function(mutationRecords) {
+    if (firstEdit) {
+      allData = JSON.parse(window.localStorage.getItem("papyrus-notes"));
+  for (var i in allData) {
+    var item = allData[i];
+    console.log(item)
+    if (document.querySelector(`#${id}>.uuid`).innerText==item.uuid) {
+      jsonThing = item;
+      jsonIndex = i;
+      break;
     }
   }
+      firstEdit = false;
+    }
+    for (var i in mutationRecords) {
+      var item = mutationRecords[i].target;
+      console.log(item);
+      allData = JSON.parse(window.localStorage.getItem("papyrus-notes")); //Just to make sure it's up to date
+      jsonThing[type] = item.wholeText;
+      allData[jsonIndex] = jsonThing;
+      window.localStorage.setItem("papyrus-notes",JSON.stringify(allData));
+    }
+  }
+  }
   return function() {
-  const config = { attributes: false, childList: true, subtree: true };
+  const config = { attributes: false, childList: true, subtree: true, characterData: true };
   document.getElementById(id).contentEditable = true;
-  var observer = new MutationObserver(callback);
-  observer.observe(document.getElementById(id), config);
-  
+  document.querySelector(`#${id}>.noteNumber`).contentEditable = false
+  document.querySelectorAll(`#${id}>button`).forEach(function(val) {val.contentEditable = false});
+  var observers = {};
+  const types = ["heading","body","source"];
+  for (var typeNum in types) {
+    var type = types[typeNum];
+    observers[type] = new MutationObserver(wrapper(type));
+    console.log(wrapper(type));
+    observers[type].observe(document.querySelector(`#${id}>.${type}`), config);
+  }
   }
 }
 
@@ -178,12 +221,12 @@ function exportNote(id) {
     body: document.querySelector(`#${id}>.body`).innerText,
     type: document.querySelector(`#${id}>.sourceType`).innerText,
     source: document.querySelector(`#${id}>.source`).innerText,
-    //uuid: document.querySelector(`#${id}>.uuid`).innerText
+    uuid: document.querySelector(`#${id}>.uuid`).innerText
   };
   note = btoa(JSON.stringify(note));
   var downloadElement = document.createElement("a");
   downloadElement.style.display = "none";
-  downloadElement.download = `${document.querySelector(`#${id}>h3`).innerHTML}.note`;
+  downloadElement.download = `${document.querySelector(`#${id}>h3`).innerText}.note`;
   downloadElement.href = "data:text/note,"+note;
   downloadElement.click();
   downloadElement.remove();
@@ -257,22 +300,22 @@ function importNote() {
             exportButton.onclick = ()=>{
               exportNote(`note${currentNotes}`);
             };
-            exportButton.innerHTML = "Export";
+            exportButton.innerText = "Export";
             note.appendChild(exportButton);
             var editButton = document.createElement("button");
             editButton.classList.add("edit-button");
             editButton.onclick = editThing(`note${currentNotes}`);
-            editButton.innerHTML = "Edit";
+            editButton.innerText = "Edit";
             note.appendChild(editButton);
             var deleteButton = document.createElement("button");
             deleteButton.classList.add("delete-button");
             deleteButton.onclick = deleteQuestion(`note${currentNotes}`);
-            deleteButton.innerHTML = "Delete";
+            deleteButton.innerText = "Delete";
             note.appendChild(deleteButton);
             var uuidThing = document.createElement("span");
             uuidThing.style.display = "none";
             uuidThing.class = "uuid";
-            uuidThing.innerHTML = iitem.uuid;
+            uuidThing.innerText = iitem.uuid;
             note.appendChild(uuidThing);
             document.getElementById("noteCtnDiv").appendChild(note);
             var prevData = "[]";
@@ -322,22 +365,22 @@ function importNote() {
     exportButton.onclick = ()=>{
       exportNote(`note${num}`);
     };
-    exportButton.innerHTML = "Export";
+    exportButton.innerText = "Export";
     note.appendChild(exportButton);
     var editButton = document.createElement("button");
     editButton.classList.add("edit-button");
     editButton.onclick = editThing(`note${num}`);
-    editButton.innerHTML = "Edit";
+    editButton.innerText = "Edit";
     note.appendChild(editButton);
     var deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.onclick = deleteQuestion(`note${num}`);
-    deleteButton.innerHTML = "Delete";
+    deleteButton.innerText = "Delete";
     note.appendChild(deleteButton);
     var uuidThing = document.createElement("span");
     uuidThing.style.display = "none";
     uuidThing.class = "uuid";
-    uuidThing.innerHTML = iitem.uuid;
+    uuidThing.innerText = iitem.uuid;
     note.appendChild(uuidThing);
     document.getElementById("noteCtnDiv").appendChild(note);
     var prevData = "[]";
@@ -399,24 +442,24 @@ if (window.localStorage.getItem("papyrus-notes")) {
     exportButton.onclick = ()=>{
       exportNote(`note${num}`);
     };
-    exportButton.innerHTML = "Export";
+    exportButton.innerText = "Export";
     note.appendChild(exportButton);
+    var uuidThing = document.createElement("span");
+    uuidThing.style.display = "none";
+    uuidThing.classList.add("uuid");
+    uuidThing.innerText = iitem.uuid;
+    note.appendChild(uuidThing);
     var editButton = document.createElement("button");
     editButton.classList.add("edit-button");
-    editButton.onclick = editThing(`note${num}`);
-    editButton.innerHTML = "Edit";
+    editButton.innerText = "Edit";
     note.appendChild(editButton);
     var deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.onclick = deleteQuestion(`note${num}`);
-    deleteButton.innerHTML = "Delete";
+    deleteButton.innerText = "Delete";
     note.appendChild(deleteButton);
-    /*var uuidThing = document.createElement("span");
-    uuidThing.style.display = "none";
-    uuidThing.class = "uuid";
-    uuidThing.innerHTML = iitem.uuid;
-    note.appendChild(uuidThing);*/
     document.getElementById("noteCtnDiv").appendChild(note);
+    editButton.onclick = editThing(`note${num}`);
     tempNum++;
     })(item);
   }

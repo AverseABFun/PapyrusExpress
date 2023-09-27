@@ -1,3 +1,4 @@
+<!-- Copyright Cosmic Technologies 2023 -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -10,7 +11,7 @@
   </head>
   <body>
     <header id="header1">
-      <h1 id="headerText"><span id="blueText">Papyrus</span>Express</h1>
+      <h1 id="headerText" ondblclick="for (val in document.querySelectorAll('*')) {document.querySelectorAll('*')[val].style.fontFamily = 'papyrus fantasy'}"><span id="blueText">Papyrus</span>Express</h1>
       <img id="darkModeSwitch" src="5041877.png" onclick="darkModeSwitch();">
       <button onclick="document.getElementById('deleteAllQuestionDiv').classList.remove('hidden')">Delete all</button>
       <button onclick="importNote();">Import note</button>
