@@ -1,7 +1,7 @@
 /* make notes look better */
 /* CLEAN UP CODE */
 /* = */ /* grid view instead? */
-/* folders */
+/* folders */ /* In progress */
 /* editing notes */ /* Done, but the code is a horrible mess */
 /* Make things look nicer: 
 * yes/no prompt
@@ -12,65 +12,148 @@
 */
 
 // Copyright Cosmic Technologies 2023
- 
-var currentNotes = window.localStorage.getItem("papyrus-notes-num") || 0;
 
-function newNote() {
-  if (!document.getElementById("noteHeadingText").value || (!document.getElementById("primaryInp").checked && !document.getElementById("secondaryInp").checked) || !document.getElementById("noteBodyText").value || !document.getElementById("sourceText").value) {
-    document.getElementById("haventFilledOutDiv").style.display = "block";
-    document.getElementById("haventFilledOutDiv").style.opacity = 1;
+const fadeAfter = 7000; // In milliseconds
+const fadeEvery = 200; // Also milliseconds
+const opacityMinus = 0.05; // the value for what it decreases the opacity by every fadeEvery milliseconds
+
+var currentNotes = window.localStorage.getItem("papyrus-notes-num") || 0;
+var folders = JSON.parse(window.localStorage.getItem("papyrus-notes-folders")) || ["Root"];
+
+function enterFolder(folderId) {
+  console.log(folderId)
+  var uuid = document.querySelector(`#${folderId}>.uuid`).innerText;
+  var folder = null;
+  var folderIndex = null;
+  for (var i in JSON.parse(window.localStorage.getItem("papyrus-notes"))) {
+    var item = JSON.parse(window.localStorage.getItem("papyrus-notes"))[i];
+    console.log(item)
+    if (item.uuid==uuid) {
+      folder = item;
+      folderIndex = i;
+    }
+  }
+  return function() {
+    document.getElementById("noteCtnDiv").innerHTML = "";
+    var tempNum = 1;
+    for (item in folder.content) {
+      var num = new Number(tempNum);
+      var iitem = folder.content[item];
+      createNote(iitem, num);
+      tempNum++;
+    }
+  }
+}
+
+function newFolder() {
+  if (!document.getElementById("folderName").value) {
+    document.getElementById("emptyDiv").style.display = "block";
+    document.getElementById("emptyDiv").style.opacity = 1;
     setTimeout(function(){
       var interval = setInterval(function(){
-        document.getElementById("haventFilledOutDiv").style.opacity -= 0.05;
-        if (document.getElementById("haventFilledOutDiv").style.opacity<=0) {
+        document.getElementById("emptyDiv").style.opacity -= opacityMinus;
+        if (document.getElementById("emptyDiv").style.opacity<=0) {
           clearInterval(interval);
-          document.getElementById("haventFilledOutDiv").style.display = "none";
+          document.getElementById("emptyDiv").style.display = "none";
         }
-      },200)
-    },7000) //seven seconds;
+      },fadeEvery)
+    },fadeAfter) //seven seconds;
     return;
   }
-  document.getElementById("haventFilledOutDiv").classList.add("hidden");
-  currentNotes++;
-  window.localStorage.setItem("papyrus-notes-num", currentNotes);
+  if (folders.includes(document.getElementById("folderName").value)) {
+    document.getElementById("alreadyExistsDiv").style.display = "block";
+    document.getElementById("alreadyExistsDiv").style.opacity = 1;
+    setTimeout(function(){
+      var interval = setInterval(function(){
+        document.getElementById("alreadyExistsDiv").style.opacity -= opacityMinus;
+        if (document.getElementById("alreadyExistsDiv").style.opacity<=0) {
+          clearInterval(interval);
+          document.getElementById("alreadyExistsDiv").style.display = "none";
+        }
+      },fadeEvery)
+    },fadeAfter) //seven seconds;
+    return;
+  }
+  folders.push(document.getElementById("folderName").value);
+
+  
+  
+  window.localStorage.setItem("papyrus-notes-folders",JSON.stringify(folders));
+
+  var prevData = "[]";
+  if (window.localStorage.getItem("papyrus-notes")) {
+    prevData = window.localStorage.getItem("papyrus-notes");
+  }
+  prevData = JSON.parse(prevData);
+  var newData = {
+    heading: document.getElementById("folderName").value,
+    folder: true,
+    uuid: crypto.randomUUID(),
+    content: []
+  };
+  prevData.push(newData)
+  createFolder(newData)
+  var data = JSON.stringify(prevData);
+  window.localStorage.setItem("papyrus-notes",data);
+  console.log(window.localStorage.getItem("papyrus-notes"));
+}
+
+function createFolder(data) {
+  var folder = document.createElement("div");
+  folder.setAttribute("id", `folder${folders.length-1}`);
+  folder.setAttribute("class", "folders notes");
+
+  var name = document.createElement("h3");
+  name.innerText = data.heading;
+  name.setAttribute("class", "heading");
+  folder.appendChild(name);
+
+  var uuidThing = document.createElement("span");
+  uuidThing.style.display = "none";
+  uuidThing.classList.add("uuid");
+  uuidThing.innerText = data.uuid;
+  folder.appendChild(uuidThing);
+
+  document.getElementById("noteCtnDiv").appendChild(folder);
+  folder.onclick = enterFolder(`folder${folders.length-1}`)
+}
+
+function createNote(data, num) {
+  console.log(data);
   var note = document.createElement("div");
-  note.setAttribute("id", `note${currentNotes}`);
+  note.setAttribute("id", `note${num}`);
   note.setAttribute("class", "notes");
   var headingElement = document.createElement("h3");
-  headingElement.innerText = document.getElementById("noteHeadingText").value;
+  headingElement.innerText = data.heading;
   headingElement.classList.add("heading");
   note.appendChild(headingElement);
   var noteNumberElement = document.createElement("h5");
-  noteNumberElement.innerText = `Note #${currentNotes}`;
+  noteNumberElement.innerText = `Note #${num}`;
   noteNumberElement.classList.add("noteNumber");
   note.appendChild(noteNumberElement);
   var typeElement = document.createElement("h4");
-  if (document.getElementById("primaryInp").checked) {
-    typeElement.innerText = "Primary Source";
-  } else if (document.getElementById("secondaryInp").checked) {
-    typeElement.innerText = "Secondary Source"
-  }
+  typeElement.innerText = data.type
   typeElement.classList.add("sourceType");
   note.appendChild(typeElement);
   var bodyElement = document.createElement("p");
-  bodyElement.innerText = document.getElementById("noteBodyText").value;
+  bodyElement.innerText = data.body;
   bodyElement.classList.add("body");
   note.appendChild(bodyElement);
   var sourceElement = document.createElement("p");
-  sourceElement.innerText = document.getElementById("sourceText").value;
+  sourceElement.innerText = data.source;
   sourceElement.classList.add("source");
   note.appendChild(sourceElement);
   var exportButton = document.createElement("button");
   exportButton.classList.add("export-button");
   exportButton.onclick = ()=>{
-    exportNote(note.id);
+    exportNote(`note${num}`);
   };
   exportButton.innerText = "Export";
   note.appendChild(exportButton);
   var uuidThing = document.createElement("span");
   uuidThing.style.display = "none";
-  uuidThing.class = "uuid";
-  uuidThing.innerText = crypto.randomUUID();
+  uuidThing.classList.add("uuid");
+  uuidThing.innerText = data.uuid;
   note.appendChild(uuidThing);
   var editButton = document.createElement("button");
   editButton.classList.add("edit-button");
@@ -78,11 +161,49 @@ function newNote() {
   note.appendChild(editButton);
   var deleteButton = document.createElement("button");
   deleteButton.classList.add("delete-button");
-  deleteButton.onclick = deleteQuestion(note.id);
+  deleteButton.onclick = deleteQuestion(`note${num}`);
   deleteButton.innerText = "Delete";
   note.appendChild(deleteButton);
   document.getElementById("noteCtnDiv").appendChild(note);
-  editButton.onclick = editThing(note.id);
+  editButton.onclick = editThing(`note${num}`);
+}
+
+function openTab(evt, cityName) {
+  var i, tabcontent, tablinks;
+
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+openTab({currentTarget: document.getElementById("noteTab")}, 'noteInputs')
+
+function newNote() {
+  if (!document.getElementById("noteHeadingText").value || (!document.getElementById("primaryInp").checked && !document.getElementById("secondaryInp").checked) || !document.getElementById("noteBodyText").value || !document.getElementById("sourceText").value) {
+    document.getElementById("haventFilledOutDiv").style.display = "block";
+    document.getElementById("haventFilledOutDiv").style.opacity = 1;
+    setTimeout(function(){
+      var interval = setInterval(function(){
+        document.getElementById("haventFilledOutDiv").style.opacity -= opacityMinus;
+        if (document.getElementById("haventFilledOutDiv").style.opacity<=0) {
+          clearInterval(interval);
+          document.getElementById("haventFilledOutDiv").style.display = "none";
+        }
+      },fadeEvery)
+    },fadeAfter) //seven seconds;
+    return;
+  }
+  currentNotes++;
+  window.localStorage.setItem("papyrus-notes-num", currentNotes);
+  
   var prevData = "[]";
   if (window.localStorage.getItem("papyrus-notes")) {
     prevData = window.localStorage.getItem("papyrus-notes");
@@ -93,8 +214,10 @@ function newNote() {
     body: document.getElementById("noteBodyText").value,
     type: document.getElementById("primaryInp").checked ? "Primary Source" : "Secondary Source",
     source: document.getElementById("sourceText").value,
-    uuid: uuidThing.innerText
+    uuid: crypto.randomUUID(),
+    folder: false
   };
+  createNote(newData, currentNotes);
   prevData.push(newData)
   var data = JSON.stringify(prevData);
   window.localStorage.setItem("papyrus-notes",data);
@@ -148,6 +271,8 @@ function deleteQuestion(id) {
 }
 
 function editThing(id) {
+  var observers = {};
+  var editing = false;
   var jsonThing = null;
   var jsonIndex = 0;
   var allData = JSON.parse(window.localStorage.getItem("papyrus-notes"));
@@ -162,54 +287,67 @@ function editThing(id) {
   }
   var firstEdit = true;
   function wrapper(type) {
-  return function(mutationRecords) {
-    if (firstEdit) {
-      allData = JSON.parse(window.localStorage.getItem("papyrus-notes"));
-  for (var i in allData) {
-    var item = allData[i];
-    console.log(item)
-    if (document.querySelector(`#${id}>.uuid`).innerText==item.uuid) {
-      jsonThing = item;
-      jsonIndex = i;
-      break;
+    return function(mutationRecords) {
+      if (firstEdit) {
+        allData = JSON.parse(window.localStorage.getItem("papyrus-notes"));
+    for (var i in allData) {
+      var item = allData[i];
+      console.log(item)
+      if (document.querySelector(`#${id}>.uuid`).innerText==item.uuid) {
+        jsonThing = item;
+        jsonIndex = i;
+        break;
+      }
     }
-  }
-      firstEdit = false;
+        firstEdit = false;
+      }
+      for (var i in mutationRecords) {
+        var item = mutationRecords[i].target;
+        console.log(item);
+        allData = JSON.parse(window.localStorage.getItem("papyrus-notes")); //Just to make sure it's up to date
+        jsonThing[type] = item.wholeText;
+        allData[jsonIndex] = jsonThing;
+        window.localStorage.setItem("papyrus-notes",JSON.stringify(allData));
+      }
     }
-    for (var i in mutationRecords) {
-      var item = mutationRecords[i].target;
-      console.log(item);
-      allData = JSON.parse(window.localStorage.getItem("papyrus-notes")); //Just to make sure it's up to date
-      jsonThing[type] = item.wholeText;
-      allData[jsonIndex] = jsonThing;
-      window.localStorage.setItem("papyrus-notes",JSON.stringify(allData));
-    }
-  }
   }
   return function() {
-  const config = { attributes: false, childList: true, subtree: true, characterData: true };
-  document.getElementById(id).contentEditable = true;
-  document.querySelector(`#${id}>.noteNumber`).contentEditable = false
-  document.querySelectorAll(`#${id}>button`).forEach(function(val) {val.contentEditable = false});
-  var observers = {};
-  const types = ["heading","body","source"];
-  for (var typeNum in types) {
-    var type = types[typeNum];
-    observers[type] = new MutationObserver(wrapper(type));
-    console.log(wrapper(type));
-    observers[type].observe(document.querySelector(`#${id}>.${type}`), config);
-  }
-  }
+    if (editing) {
+      document.querySelector(`#${id}>.edit-button`).innerText = "Edit";
+      document.getElementById(id).contentEditable = false;
+      editing = false;
+      for (var num in Object.keys(observers)) {
+        var val = observers[Object.keys(observers)[num]];
+        val.disconnect();
+      }
+      return;
+    }
+    document.querySelector(`#${id}>.edit-button`).innerText = "Stop editing";
+    editing = true;
+    const config = { attributes: false, childList: true, subtree: true, characterData: true };
+    document.getElementById(id).contentEditable = true;
+    document.querySelector(`#${id}>.noteNumber`).contentEditable = false
+    document.querySelectorAll(`#${id}>button`).forEach(function(val) {val.contentEditable = false});
+    const types = ["heading","body","source"];
+      for (var typeNum in types) {
+        var type = types[typeNum];
+        observers[type] = new MutationObserver(wrapper(type));
+        console.log(type);
+        observers[type].observe(document.querySelector(`#${id}>.${type}`), config);
+      }
+    }
 }
 
 function darkModeSwitch() {
   if (document.querySelector("body").style.backgroundColor == "rgb(32, 32, 33)") {
     document.querySelector("body").style.backgroundColor = "white";
     document.querySelector("body").style.color = "black";
+    document.getElementById("dark-tab-wrapper").id = "tab-wrapper";
     window.localStorage.setItem("darkMode","false");
   } else {
     document.querySelector("body").style.backgroundColor = "#202021";
     document.querySelector("body").style.color = "white";
+    document.getElementById("tab-wrapper").id = "dark-tab-wrapper";
     window.localStorage.setItem("darkMode","true");
   }
 }
@@ -258,131 +396,27 @@ function exportNotes() {
   downloadElement.click();
   downloadElement.remove();
 }
-function importNote() {
-  var fileImport = document.getElementById("fileImport");
-  fileImport.onchange = _ => {
-    let file = Array.from(fileImport.files)[0];
-    let reader = new FileReader();
-
-    reader.onload = (function(file) {
-        return function(e) {
-          console.log(e.target.result);
-          if (!e.target.result.endsWith("||NOTES")) {
-            currentNotes++;
-            var iitem = JSON.parse(atob(e.target.result));
-            console.log(iitem);
-            console.log(currentNotes);
-            var note = document.createElement("div");
-            note.setAttribute("id", `note${currentNotes}`);
-            note.setAttribute("class", "notes");
-            var headingElement = document.createElement("h3");
-            headingElement.innerText = iitem.heading;
-            headingElement.classList.add("heading");
-            note.appendChild(headingElement);
-            var noteNumberElement = document.createElement("h5");
-            noteNumberElement.innerText = `Note #${currentNotes}`;
-            noteNumberElement.classList.add("noteNumber");
-            note.appendChild(noteNumberElement);
-            var typeElement = document.createElement("h4");
-            typeElement.innerText = iitem.type
-            noteNumberElement.classList.add("sourceType");
-            note.appendChild(typeElement);
-            var bodyElement = document.createElement("p");
-            bodyElement.innerText = iitem.body;
-            bodyElement.classList.add("body");
-            note.appendChild(bodyElement);
-            var sourceElement = document.createElement("p");
-            sourceElement.innerText = iitem.source;
-            sourceElement.classList.add("source");
-            note.appendChild(sourceElement);
-            var exportButton = document.createElement("button");
-            exportButton.classList.add("export-button");
-            exportButton.onclick = ()=>{
-              exportNote(`note${currentNotes}`);
-            };
-            exportButton.innerText = "Export";
-            note.appendChild(exportButton);
-            var editButton = document.createElement("button");
-            editButton.classList.add("edit-button");
-            editButton.onclick = editThing(`note${currentNotes}`);
-            editButton.innerText = "Edit";
-            note.appendChild(editButton);
-            var deleteButton = document.createElement("button");
-            deleteButton.classList.add("delete-button");
-            deleteButton.onclick = deleteQuestion(`note${currentNotes}`);
-            deleteButton.innerText = "Delete";
-            note.appendChild(deleteButton);
-            var uuidThing = document.createElement("span");
-            uuidThing.style.display = "none";
-            uuidThing.class = "uuid";
-            uuidThing.innerText = iitem.uuid;
-            note.appendChild(uuidThing);
-            document.getElementById("noteCtnDiv").appendChild(note);
-            var prevData = "[]";
-            if (window.localStorage.getItem("papyrus-notes")) {
-              prevData = window.localStorage.getItem("papyrus-notes");
-            }
-            prevData = JSON.parse(prevData);
-            var newData = iitem;
-            prevData.push(newData)
-            var data = JSON.stringify(prevData);
-            window.localStorage.setItem("papyrus-notes",data);
-            window.localStorage.setItem("papyrus-notes-num",currentNotes)
-          } else {
-            var tempNum = 1;
-              var item = null;
+function importSingleFile(e) {
+  currentNotes++;
+  var iitem = JSON.parse(atob(e.target.result));
+  var prevData = "[]";
+  if (window.localStorage.getItem("papyrus-notes")) {
+    prevData = window.localStorage.getItem("papyrus-notes");
+  }
+  prevData = JSON.parse(prevData);
+  var newData = iitem;
+  prevData.push(newData)
+  createNote(newData, currentNotes);
+  var data = JSON.stringify(prevData);
+  window.localStorage.setItem("papyrus-notes",data);
+  window.localStorage.setItem("papyrus-notes-num",currentNotes)
+}
+function importMultipleFile(e) {
+  var tempNum = 1;
+  var item = null;
   for (item in JSON.parse(atob(e.target.result.split("||")[0].toString()))) {
-    (function(item){
     var num = new Number(tempNum);
     var iitem = JSON.parse(atob(e.target.result.split("||")[0]))[item];
-    console.log(iitem);
-    console.log(num);
-    var note = document.createElement("div");
-    note.setAttribute("id", `note${num}`);
-    note.setAttribute("class", "notes");
-    var headingElement = document.createElement("h3");
-    headingElement.innerText = iitem.heading;
-    headingElement.classList.add("heading");
-    note.appendChild(headingElement);
-    var noteNumberElement = document.createElement("h5");
-    noteNumberElement.innerText = `Note #${num}`;
-    noteNumberElement.classList.add("noteNumber");
-    note.appendChild(noteNumberElement);
-    var typeElement = document.createElement("h4");
-    typeElement.innerText = iitem.type
-    typeElement.classList.add("sourceType");
-    note.appendChild(typeElement);
-    var bodyElement = document.createElement("p");
-    bodyElement.innerText = iitem.body;
-    bodyElement.classList.add("body");
-    note.appendChild(bodyElement);
-    var sourceElement = document.createElement("p");
-    sourceElement.innerText = iitem.source;
-    sourceElement.classList.add("source");
-    note.appendChild(sourceElement);
-    var exportButton = document.createElement("button");
-    exportButton.classList.add("export-button");
-    exportButton.onclick = ()=>{
-      exportNote(`note${num}`);
-    };
-    exportButton.innerText = "Export";
-    note.appendChild(exportButton);
-    var editButton = document.createElement("button");
-    editButton.classList.add("edit-button");
-    editButton.onclick = editThing(`note${num}`);
-    editButton.innerText = "Edit";
-    note.appendChild(editButton);
-    var deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete-button");
-    deleteButton.onclick = deleteQuestion(`note${num}`);
-    deleteButton.innerText = "Delete";
-    note.appendChild(deleteButton);
-    var uuidThing = document.createElement("span");
-    uuidThing.style.display = "none";
-    uuidThing.class = "uuid";
-    uuidThing.innerText = iitem.uuid;
-    note.appendChild(uuidThing);
-    document.getElementById("noteCtnDiv").appendChild(note);
     var prevData = "[]";
     if (window.localStorage.getItem("papyrus-notes")) {
       prevData = window.localStorage.getItem("papyrus-notes");
@@ -392,16 +426,32 @@ function importNote() {
     prevData.push(newData)
     var data = JSON.stringify(prevData);
     window.localStorage.setItem("papyrus-notes",data);
+    createNote(newData, currentNotes);
     tempNum++;
     currentNotes++;
-    })(item);
   }
-              window.localStorage.setItem("papyrus-notes-num",currentNotes);
+  window.localStorage.setItem("papyrus-notes-num",currentNotes);
+}
+function importFileThing(file) {
+    let reader = new FileReader();
+
+    reader.onload = (function(file) {
+        return function(e) {
+          console.log(e.target.result);
+          if (!e.target.result.endsWith("||NOTES")) {
+            importSingleFile(e);
+          } else {
+            importMultipleFile(e);
           }
         };
       })(file);
 
       reader.readAsText(file);
+}
+function importNote() {
+  var fileImport = document.getElementById("fileImport");
+  fileImport.onchange = _ => {
+    importFileThing(Array.from(fileImport.files)[0]);
   };
   fileImport.click();
 }
@@ -409,62 +459,32 @@ function importNote() {
 if (window.localStorage.getItem("papyrus-notes")) {
   var tempNum = 1;
   for (item in JSON.parse(window.localStorage.getItem("papyrus-notes"))) {
-    (function(item){
     var num = new Number(tempNum);
     var iitem = JSON.parse(window.localStorage.getItem("papyrus-notes"))[item];
-    console.log(iitem);
-    console.log(num);
-    var note = document.createElement("div");
-    note.setAttribute("id", `note${num}`);
-    note.setAttribute("class", "notes");
-    var headingElement = document.createElement("h3");
-    headingElement.innerText = iitem.heading;
-    headingElement.classList.add("heading");
-    note.appendChild(headingElement);
-    var noteNumberElement = document.createElement("h5");
-    noteNumberElement.innerText = `Note #${num}`;
-    noteNumberElement.classList.add("noteNumber");
-    note.appendChild(noteNumberElement);
-    var typeElement = document.createElement("h4");
-    typeElement.innerText = iitem.type
-    typeElement.classList.add("sourceType");
-    note.appendChild(typeElement);
-    var bodyElement = document.createElement("p");
-    bodyElement.innerText = iitem.body;
-    bodyElement.classList.add("body");
-    note.appendChild(bodyElement);
-    var sourceElement = document.createElement("p");
-    sourceElement.innerText = iitem.source;
-    sourceElement.classList.add("source");
-    note.appendChild(sourceElement);
-    var exportButton = document.createElement("button");
-    exportButton.classList.add("export-button");
-    exportButton.onclick = ()=>{
-      exportNote(`note${num}`);
-    };
-    exportButton.innerText = "Export";
-    note.appendChild(exportButton);
-    var uuidThing = document.createElement("span");
-    uuidThing.style.display = "none";
-    uuidThing.classList.add("uuid");
-    uuidThing.innerText = iitem.uuid;
-    note.appendChild(uuidThing);
-    var editButton = document.createElement("button");
-    editButton.classList.add("edit-button");
-    editButton.innerText = "Edit";
-    note.appendChild(editButton);
-    var deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete-button");
-    deleteButton.onclick = deleteQuestion(`note${num}`);
-    deleteButton.innerText = "Delete";
-    note.appendChild(deleteButton);
-    document.getElementById("noteCtnDiv").appendChild(note);
-    editButton.onclick = editThing(`note${num}`);
+    createNote(iitem, num);
     tempNum++;
-    })(item);
   }
 }
 if (window.localStorage.getItem("darkMode")=="true") {
-  document.querySelector("body").style.backgroundColor = "#202021";
-  document.querySelector("body").style.color = "white";
+  darkModeSwitch();
+}
+
+let dropArea = document.getElementById('drop-area')
+;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, preventDefaults, false)
+  dropArea.addEventListener(eventName, handleDrop, false)
+})
+function preventDefaults (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+function handleDrop(e) {
+  let dt = e.dataTransfer
+  let files = dt.files
+
+  handleFiles(files)
+}
+function handleFiles(files) {
+  importFileThing(Array.from(files)[0])
 }

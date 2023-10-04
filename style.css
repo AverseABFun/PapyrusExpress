@@ -18,7 +18,7 @@ label {
   font-size: 17.5px;
 }
 
-input, textarea {
+input, select, textarea {
   font-size: 15px;
   font-family: Roboto, sans-serif;
 }
@@ -78,7 +78,7 @@ input, textarea {
 #disclaimer-link, #disclaimer-link:visited {
   color: lightgray;
 }
-#haventFilledOutDiv {
+#haventFilledOutDiv, #alreadyExistsDiv, #emptyDiv {
   color: red;
   margin: bottom;
 }
@@ -110,4 +110,115 @@ button:hover {
 }
 #disclaimer-text {
   margin: 5%;
+}
+
+#tab-wrapper {
+  overflow: hidden;
+  background-color: white;
+  text-align: center;
+  margin-top: 2%;
+  border-bottom: 1px black solid;
+}
+#tab-wrapper button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: #333;
+}
+#tab-wrapper button:hover {
+  background-color: #555;
+  color: #CCC;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#tab-wrapper button.active {
+  background-color: #333;
+  color: #BBB;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  animation: fadeEffect3 1s;
+}
+
+#dark-tab-wrapper {
+  overflow: hidden;
+  background-color: #202021;
+  text-align: center;
+  margin-top: 2%;
+  border-bottom: 1px white solid;
+}
+#dark-tab-wrapper button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#dark-tab-wrapper button:hover {
+  background-color: #aaa;
+  color: #333;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#dark-tab-wrapper button.active {
+  background-color: #ccc;
+  color: #444;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  animation: fadeEffect2 1s;
+}
+
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+}
+.tabcontent {
+  animation: fadeEffect 1s;
+}
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes fadeEffect2 {
+  from {
+    background-color: #aaa;
+    color: #333;
+  }
+  to {
+    background-color: #ccc;
+    color: #444;
+  }
+}
+@keyframes fadeEffect3 {
+  from {
+    background-color: #555;
+    color: #CCC;
+  }
+  to {
+    background-color: #333;
+    color: #BBB;
+  }
+}
+
+#drop-area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+#noteTab {
+  margin-left: 5%;
+}
+#folderTab {
+  margin-left: 1%;
 }

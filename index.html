@@ -10,6 +10,7 @@
     <link rel="manifest" href="/manifest.json">
   </head>
   <body>
+    <div id="drop-area"></div>
     <header id="header1">
       <h1 id="headerText" ondblclick="for (val in document.querySelectorAll('*')) {document.querySelectorAll('*')[val].style.fontFamily = 'papyrus fantasy'}"><span id="blueText">Papyrus</span>Express</h1>
       <img id="darkModeSwitch" src="5041877.png" onclick="darkModeSwitch();">
@@ -24,27 +25,48 @@
     </div>
     <div id="deleteAllQuestionDiv" class="hidden" class="confimation">
       <p class="deleteprompt">Delete all of your notes?<br></p>
-      <button id="deleteAll-yes" onclick="window.localStorage.removeItem('papyrus-notes'); window.localStorage.removeItem('papyrus-notes-num'); window.location.reload();document.getElementById('deleteAllQuestionDiv').classList.add('hidden')">Yes</button><button id="deleteAll-no" onclick="document.getElementById('deleteAllQuestionDiv').classList.add('hidden')">No</button>
+      <button id="deleteAll-yes" onclick="window.localStorage.removeItem('papyrus-notes'); window.localStorage.removeItem('papyrus-notes-num');document.getElementById('deleteAllQuestionDiv').classList.add('hidden');window.localStorage.removeItem('papyrus-notes-folders');window.location.reload();">Yes</button><button id="deleteAll-no" onclick="document.getElementById('deleteAllQuestionDiv').classList.add('hidden')">No</button>
+    </div>
+    <div id="tab-wrapper">
+      <button id="noteTab" class="tablinks" onclick="openTab(event, 'noteInputs')">New Note</button>
+      <button id="folderTab" class="tablinks" onclick="openTab(event, 'folderInputs')">New Folder</button>
     </div>
     <div id="valuesDiv" class="floatClass">
-      <div id="haventFilledOutDiv" class="hidden">
-        You haven't filled out everything! If you don't want a value somewhere, type "N/A".
-      </div>
-      <div id="sourceTypeDiv">
-        <div id="radioBtnDiv">
-          <label for="primaryInp">Primary</label>
-          <input id="primaryInp" name="inpType" type="radio">
-          <label for="secondaryInp">Secondary</label>
-          <input id="secondaryInp" name="inpType" type="radio"><br><br>
+      <div id="folderInputs" class="tabcontent">
+        <div id="alreadyExistsDiv" class="hidden">
+          That folder already exists!
         </div>
+        <div id="emptyDiv" class="hidden">
+          You need to give the folder a name!
+        </div>
+        <label for="folderName">Folder name</label><br>
+        <input id="folderName" name="folderName" type="text"><br><br>
+        <button id="newFolderBtn" onclick="newFolder();">[+] New Folder</button>
       </div>
-      <label for="noteHeadingText">Heading</label><br>
-      <input id="noteHeadingText" name="noteHeadingText" type="text"><br><br>
-      <label for="noteBodyText">Body</label><br>
-      <textarea id="noteBodyText" name="noteBodyText" placeholder="Drag the resizer in the corner."></textarea><br><br>
-      <label for="sourceText">Source (website, book, etc.)</label><br>
-      <input id="sourceText" name="sourceText" type="text"><br><br>
-      <button id="newBtn" onclick="newNote();">[+] New Note</button>
+      <div id='noteInputs' class="tabcontent">
+        <div id="haventFilledOutDiv" class="hidden">
+          You haven't filled out everything! If you don't want a value somewhere, type "N/A".
+        </div>
+        <div id="sourceTypeDiv">
+          <div id="radioBtnDiv">
+            <label for="primaryInp">Primary</label>
+            <input id="primaryInp" name="inpType" type="radio">
+            <label for="secondaryInp">Secondary</label>
+            <input id="secondaryInp" name="inpType" type="radio"><br><br>
+          </div>
+        </div>
+        <label for="noteHeadingText">Heading</label><br>
+        <input id="noteHeadingText" name="noteHeadingText" type="text"><br><br>
+        <label for="noteBodyText">Body</label><br>
+        <textarea id="noteBodyText" name="noteBodyText" placeholder="Drag the resizer in the corner."></textarea><br><br>
+        <label for="sourceText">Source (website, book, etc.)</label><br>
+        <input id="sourceText" name="sourceText" type="text"><br><br>
+        <label for="folderSelect">Select folder</label>
+        <select id="folderSelect" name="folderSelect">
+          <option value="root">Root</option>
+        </select><br><br>
+        <button id="newBtn" onclick="newNote();">[+] New Note</button>
+      </div>
     </div>
     <div id="divider" class="floatClass"></div>
     <div id="noteCtnDiv" class="floatClass">
