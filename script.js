@@ -267,7 +267,7 @@ function deleteQuestion(id) {
         heading: document.querySelector(`#${note.id}>.heading`).innerText,
         body: document.querySelector(`#${note.id}>.body`).innerText,
         type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-        source: document.querySelector(`#${note.id}>.source`).innerText,
+        source: document.querySelector(`#${note.id}>.source`).innerHTML,
         uuid: document.querySelector(`#${note.id}>.uuid`).innerText
       };
       notess.push(notee);
@@ -371,7 +371,7 @@ function exportNote(id) {
     heading: document.querySelector(`#${id}>.heading`).innerText,
     body: document.querySelector(`#${id}>.body`).innerText,
     type: document.querySelector(`#${id}>.sourceType`).innerText,
-    source: document.querySelector(`#${id}>.source`).innerText,
+    source: document.querySelector(`#${id}>.source`).innerHTML,
     uuid: document.querySelector(`#${id}>.uuid`).innerText
   };
   note = btoa(JSON.stringify(note));
@@ -396,7 +396,7 @@ function exportNotes() {
       heading: document.querySelector(`#${note.id}>.heading`).innerText,
       body: document.querySelector(`#${note.id}>.body`).innerText,
       type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-      source: document.querySelector(`#${note.id}>.source`).innerText,
+      source: document.querySelector(`#${note.id}>.source`).innerHTML,
       uuid: document.querySelector(`#${note.id}>.uuid`).innerText
     };
     notess.push(notee);
