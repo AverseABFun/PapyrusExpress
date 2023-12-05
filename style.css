@@ -175,6 +175,10 @@ button:hover {
   animation: fadeEffect2 1s;
 }
 
+#folderTab {
+  cursor: default;
+}
+
 .tabcontent {
   display: none;
   padding: 6px 12px;
