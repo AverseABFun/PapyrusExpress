@@ -140,7 +140,7 @@ function createNote(data, num) {
   bodyElement.classList.add("body");
   note.appendChild(bodyElement);
   var sourceElement = document.createElement("p");
-  const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+  /*const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
   if (matches) {
     let m;
     while ((m = regex.exec(data.source)) != null) {
@@ -152,7 +152,7 @@ function createNote(data, num) {
         data.source = data.source.replace(match,"<a href=\""+match+"\">"+match+"</a>");
       });
     }
-  }
+  }*/ // doesnt work cause OF COURSE IT DOESNT
   sourceElement.innerText = data.source;
   sourceElement.classList.add("source");
   note.appendChild(sourceElement);
