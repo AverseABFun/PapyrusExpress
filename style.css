@@ -176,7 +176,26 @@ button:hover {
 }
 
 #folderTab {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
   cursor: default;
+  transition: 0.3s;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: #333;
+}
+#folderTab:hover {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: default;
+  transition: 0.3s;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: #333;
 }
 
 .tabcontent {
