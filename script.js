@@ -376,6 +376,7 @@ function exportNote(id) {
   };
   note = btoa(JSON.stringify(note));
   var downloadElement = document.createElement("a");
+  document.body.appendChild(downloadElement);
   downloadElement.style.display = "none";
   downloadElement.download = `${document.querySelector(`#${id}>h3`).innerText}.note`;
   downloadElement.href = "data:text/note,"+note;
@@ -403,6 +404,7 @@ function exportNotes() {
   }
   notes = btoa(JSON.stringify(notess))+`||${notess.length}||NOTES`;
   var downloadElement = document.createElement("a");
+  document.body.appendChild(downloadElement);
   downloadElement.style.display = "none";
   downloadElement.download = `my_notes.notes`;
   downloadElement.href = "data:text/notes,"+notes;
