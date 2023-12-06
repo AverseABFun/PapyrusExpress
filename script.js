@@ -124,7 +124,7 @@ function createNote(data, num) {
   note.setAttribute("id", `note${num}`);
   note.setAttribute("class", "notes");
   var headingElement = document.createElement("h3");
-  headingElement.innerText = data.heading;
+  headingElement.innerText = data.heading || "";
   headingElement.classList.add("heading");
   note.appendChild(headingElement);
   var noteNumberElement = document.createElement("h5");
@@ -132,17 +132,21 @@ function createNote(data, num) {
   noteNumberElement.classList.add("noteNumber");
   note.appendChild(noteNumberElement);
   var typeElement = document.createElement("h4");
-  typeElement.innerText = data.type
+  typeElement.innerText = data.type || "";
   typeElement.classList.add("sourceType");
   note.appendChild(typeElement);
   var bodyElement = document.createElement("p");
-  bodyElement.innerText = data.body;
+  bodyElement.innerText = data.body || "";
   bodyElement.classList.add("body");
   note.appendChild(bodyElement);
   var sourceElement = document.createElement("p");
-  sourceElement.innerText = data.source;
+  sourceElement.innerText = data.source || "";
   sourceElement.classList.add("source");
   note.appendChild(sourceElement);
+  var annotationElement = document.createElement("p");
+  annotationElement.innerText = data.annotation || "";
+  annotationElement.classList.add("annotation");
+  note.appendChild(annotationElement);
   var exportButton = document.createElement("button");
   exportButton.classList.add("export-button");
   exportButton.onclick = ()=>{
@@ -214,6 +218,7 @@ function newNote() {
     body: document.getElementById("noteBodyText").value,
     type: document.getElementById("primaryInp").checked ? "Primary Source" : "Secondary Source",
     source: document.getElementById("sourceText").value,
+    annotation: document.getElementById("annotationText").value,
     uuid: crypto.randomUUID(),
     folder: false
   };
