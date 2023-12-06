@@ -377,6 +377,7 @@ function exportNote(id) {
     body: document.querySelector(`#${id}>.body`).innerText,
     type: document.querySelector(`#${id}>.sourceType`).innerText,
     source: document.querySelector(`#${id}>.source`).innerHTML,
+    annotation: document.querySelector(`#${id}>.annotation`).innerText,
     uuid: document.querySelector(`#${id}>.uuid`).innerText
   };
   note = btoa(JSON.stringify(note));
@@ -389,6 +390,7 @@ function exportNote(id) {
   downloadElement.remove();
 }
 function exportNotes() {
+  try {
   var notes = document.getElementById("noteCtnDiv");
   var note = null;
   var notess = [];
@@ -403,6 +405,7 @@ function exportNotes() {
       body: document.querySelector(`#${note.id}>.body`).innerText,
       type: document.querySelector(`#${note.id}>.sourceType`).innerText,
       source: document.querySelector(`#${note.id}>.source`).innerHTML,
+      annotation: document.querySelector(`#${note.id}>.annotation`).innerText,
       uuid: document.querySelector(`#${note.id}>.uuid`).innerText
     };
     notess.push(notee);
@@ -415,6 +418,9 @@ function exportNotes() {
   downloadElement.href = "data:text/notes,"+notes;
   downloadElement.click();
   downloadElement.remove();
+  } catch (e) {
+    document.getElementById("errors").innerHTML += e.toString();
+  }
 }
 function importSingleFile(e) {
   currentNotes++;
