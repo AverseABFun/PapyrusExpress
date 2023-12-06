@@ -410,7 +410,7 @@ function exportNotes() {
     };
     notess.push(notee);
   }
-  notes = btoa(JSON.stringify(notess))+`||${notess.length}||NOTES`;
+  notes = btoa(JSON.stringify(unescape(encodeURIComponent(notess))))+`||${notess.length}||NOTES`;
   var downloadElement = document.createElement("a");
   document.body.appendChild(downloadElement);
   downloadElement.style.display = "none";
@@ -440,9 +440,9 @@ function importSingleFile(e) {
 function importMultipleFile(e) {
   var tempNum = 1;
   var item = null;
-  for (item in JSON.parse(atob(e.target.result.split("||")[0].toString()))) {
+  for (item in JSON.parse(decodeURIComponent(escape(atob(e.target.result.split("||")[0].toString()))))) {
     var num = new Number(tempNum);
-    var iitem = JSON.parse(atob(e.target.result.split("||")[0]))[item];
+    var iitem = JSON.parse(decodeURIComponent(escape(atob(e.target.result.split("||")[0]))))[item];
     var prevData = "[]";
     if (window.localStorage.getItem("papyrus-notes")) {
       prevData = window.localStorage.getItem("papyrus-notes");
