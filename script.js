@@ -124,7 +124,7 @@ function createNote(data, num) {
   note.setAttribute("id", `note${num}`);
   note.setAttribute("class", "notes");
   var headingElement = document.createElement("h3");
-  headingElement.innerText = data.heading || "";
+  headingElement.innerText = data.heading || "empty";
   headingElement.classList.add("heading");
   note.appendChild(headingElement);
   var noteNumberElement = document.createElement("h5");
@@ -132,11 +132,11 @@ function createNote(data, num) {
   noteNumberElement.classList.add("noteNumber");
   note.appendChild(noteNumberElement);
   var typeElement = document.createElement("h4");
-  typeElement.innerText = data.type || "";
+  typeElement.innerText = data.type || "empty";
   typeElement.classList.add("sourceType");
   note.appendChild(typeElement);
   var bodyElement = document.createElement("p");
-  bodyElement.innerText = data.body || "";
+  bodyElement.innerText = data.body || "empty";
   bodyElement.classList.add("body");
   note.appendChild(bodyElement);
   var sourceElement = document.createElement("p");
@@ -153,11 +153,11 @@ function createNote(data, num) {
       });
     }
   }*/ // doesnt work cause OF COURSE IT DOESNT
-  sourceElement.innerText = data.source || "";
+  sourceElement.innerText = data.source || "empty";
   sourceElement.classList.add("source");
   note.appendChild(sourceElement);
   var annotationElement = document.createElement("p");
-  annotationElement.innerText = data.annotation || "";
+  annotationElement.innerText = data.annotation || "empty";
   annotationElement.classList.add("annotation");
   note.appendChild(annotationElement);
   var exportButton = document.createElement("button");
@@ -346,7 +346,7 @@ function editThing(id) {
     document.getElementById(id).contentEditable = true;
     document.querySelector(`#${id}>.noteNumber`).contentEditable = false
     document.querySelectorAll(`#${id}>button`).forEach(function(val) {val.contentEditable = false});
-    const types = ["heading","body","source"];
+    const types = ["heading","body","source","annotation"];
       for (var typeNum in types) {
         var type = types[typeNum];
         observers[type] = new MutationObserver(wrapper(type));
