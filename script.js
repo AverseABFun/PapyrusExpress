@@ -140,6 +140,19 @@ function createNote(data, num) {
   bodyElement.classList.add("body");
   note.appendChild(bodyElement);
   var sourceElement = document.createElement("p");
+  /*const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+  if (matches) {
+    let m;
+    while ((m = regex.exec(data.source)) != null) {
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+      m.forEach((match, groupIndex) => {
+        console.log(`Found match, group ${groupIndex}: ${match}`);
+        data.source = data.source.replace(match,"<a href=\""+match+"\">"+match+"</a>");
+      });
+    }
+  }*/ // doesnt work cause OF COURSE IT DOESNT
   sourceElement.innerText = data.source || "";
   sourceElement.classList.add("source");
   note.appendChild(sourceElement);
@@ -259,7 +272,7 @@ function deleteQuestion(id) {
         heading: document.querySelector(`#${note.id}>.heading`).innerText,
         body: document.querySelector(`#${note.id}>.body`).innerText,
         type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-        source: document.querySelector(`#${note.id}>.source`).innerText,
+        source: document.querySelector(`#${note.id}>.source`).innerHTML,
         uuid: document.querySelector(`#${note.id}>.uuid`).innerText
       };
       notess.push(notee);
@@ -363,11 +376,12 @@ function exportNote(id) {
     heading: document.querySelector(`#${id}>.heading`).innerText,
     body: document.querySelector(`#${id}>.body`).innerText,
     type: document.querySelector(`#${id}>.sourceType`).innerText,
-    source: document.querySelector(`#${id}>.source`).innerText,
+    source: document.querySelector(`#${id}>.source`).innerHTML,
     uuid: document.querySelector(`#${id}>.uuid`).innerText
   };
   note = btoa(JSON.stringify(note));
   var downloadElement = document.createElement("a");
+  document.body.appendChild(downloadElement);
   downloadElement.style.display = "none";
   downloadElement.download = `${document.querySelector(`#${id}>h3`).innerText}.note`;
   downloadElement.href = "data:text/note,"+note;
@@ -388,13 +402,14 @@ function exportNotes() {
       heading: document.querySelector(`#${note.id}>.heading`).innerText,
       body: document.querySelector(`#${note.id}>.body`).innerText,
       type: document.querySelector(`#${note.id}>.sourceType`).innerText,
-      source: document.querySelector(`#${note.id}>.source`).innerText,
+      source: document.querySelector(`#${note.id}>.source`).innerHTML,
       uuid: document.querySelector(`#${note.id}>.uuid`).innerText
     };
     notess.push(notee);
   }
   notes = btoa(JSON.stringify(notess))+`||${notess.length}||NOTES`;
   var downloadElement = document.createElement("a");
+  document.body.appendChild(downloadElement);
   downloadElement.style.display = "none";
   downloadElement.download = `my_notes.notes`;
   downloadElement.href = "data:text/notes,"+notes;
